@@ -81,14 +81,8 @@ function GameWorld(width, height) {
 		costLabel.setPositionY(142);
 		stage.addChild(costLabel);
 
-		var startPt = new Point(50, 210);
-		var ox = 73;
 		for (var i = 0; i < 3; i++) {
-			var img = new ImageView(render, "num_7.png");
-			img.setWidth(70);
-			img.setHeight(90);
-			img.setPositionX(startPt.x + i * ox);
-			img.setPositionY(startPt.y);
+			var img = this.getFruitIconNode(i);
 			stage.addChild(img);
 		}
 
@@ -122,10 +116,30 @@ function GameWorld(width, height) {
 	}
 
 	this.startRandom = function() {
-		//
-		if (true) {
-			this.showPopPanel();
+		for (var i = 0; i < 3; i++) {
+			var icon = self["icon" + i];
+			if (i == 2) {
+				icon._userData.play(
+						function() {
+							self.showResult();
+						});
+			} else {
+				icon._userData.play();
+			}
 		}
+	}
+
+	this.showResult = function() {
+		var name1 = self.icon1._userData.getIconName();
+		var name2 = self.icon2._userData.getIconName();
+		if (name2 == name1) {
+			var name3 = self.icon3._userData.getIconName();
+			if (name3 == name1) {
+				self.playBtn.setTouchEnabled(true);
+				return;
+			}
+		}
+		self.showPopPanel();
 	}
 
 	this.showPopPanel = function() {
@@ -187,6 +201,82 @@ function GameWorld(width, height) {
 		againLabel.setPositionX(againBtn.getPositionX() + 35);
 		againLabel.setPositionY(againBtn.getPositionY() + 32);
 		againBtn.addChild(againLabel);
+	}
+
+	this.getFruitIconNode = function(index) {
+		var size = new Size(70, 90);
+		var startPt = new Point(50, 210);
+		var ox = 73;
+
+		var pt = new Point(startPt.x + index * ox, startPt.y);
+		var getRandomFruitIcon = function() {
+			var id = Math.round(Math.random() * 6 + 1);
+			return "icon_" + id + ".png";
+		}
+
+		var board = new ViewContainer(render);
+		board.setWidth(size.width);
+		board.setHeight(size.height);
+		board.setClippingEnabled(true);
+		board.setClippingRect(new Rect(new Point(pt.x, pt.y), new Size(70, 90)));
+		board.setPositionX(pt.x);
+		board.setPositionY(pt.y);
+
+		var img1 = new ImageView(render, "num_7.png");
+		img1.setWidth(size.width);
+		img1.setHeight(size.height);
+		img1.setPositionX(pt.x);
+		img1.setPositionY(pt.y);
+		board.addChild(img1);
+
+		var img2 = new ImageView(render, getRandomFruitIcon());
+		img2.setWidth(size.width);
+		img2.setHeight(size.height);
+		img2.setPositionX(pt.x);
+		img2.setPositionY(img1.getPositionY() - size.height);
+		board.addChild(img2);
+
+		var setFruitImgPositionY = function(y) {
+			img1.setPositionY(y);
+			img2.setPositionY(img1.getPositionY() - size.height);
+		}
+
+		var refreshFruitImg = function() {
+			img1.setImage(img2.getImage());
+			img2.setImage(getRandomFruitIcon());
+		}
+
+		board._userData = {
+			play : function(finishHandler) {
+					   setFruitImgPositionY(pt.y);
+
+					   var curTime = 0;
+					   var totalTime = 0;
+					   board.doUpdate = function(dt) {
+						   curTime += dt;
+						   totalTime += dt;
+						   setFruitImgPositionY(pt.y + curTime * 600);
+						   if (img2.getPositionY() >= pt.y) {
+							   curTime = 0;
+							   setFruitImgPositionY(pt.y);
+							   refreshFruitImg();
+						   }
+
+						   if (totalTime >= (index + 1)) {
+							   board.doUpdate = function(dt){};
+							   setFruitImgPositionY(pt.y);
+							   refreshFruitImg();
+							   delayRun(board, 0.8, finishHandler);
+						   }
+					   }
+				   },
+			getIconName : function() {
+							  return img1.getImage();
+						  },
+		};
+		self["icon" + index] = board;
+
+		return board;
 	}
 }
 
