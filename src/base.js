@@ -1,10 +1,30 @@
 ﻿
-
+//
+// utils
+//
 function log(s) {
 	console.log(s);
 }
 
-//////////////////////////////
+function delayRun(view, delayTime, func) {
+	var totalTime = 0;
+	var tempView = new ViewContainer(view.getRender());
+	tempView.doUpdate = function(dt) {
+		totalTime += dt;
+		if (totalTime >= delayTime) {
+			tempView.doUpdate = function(dt){};
+			if (func) {
+				func();
+			}
+			tempView.removeFromParent();
+		}
+	}
+	view.addChild(tempView);
+}
+
+//
+// kernel
+//
 function Point(x, y) {
 	this.x = x;
 	this.y = y;
@@ -159,6 +179,9 @@ function ViewContainer(render) {
 	this.getTouchEnabled = function() {
 		return this.isTouchEnabled;
 	}
+	this.getRender = function() {
+		return this.render;
+	}
 	this.update = function(dt) {
 		this.doUpdate(dt);
 		for (var i = 0; i < this.children.length; i++) {
@@ -246,11 +269,18 @@ function ViewContainer(render) {
 
 function ImageView(render, imageName) {
 	ViewContainer.call(this, render);
+	this.realImage = imageName;
 	this.image = "img/" + imageName;
 
 	this.setImage = function(imageName) {
+		this.realImage = imageName;
 		this.image = "img/" + imageName;
 	}
+
+	this.getImage = function() {
+		return this.realImage;
+	}
+
 	this.doDraw = function() {
 		var img = new Image();
 		img.src = this.image;
