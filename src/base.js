@@ -269,21 +269,23 @@ function ViewContainer(render) {
 
 function ImageView(render, imageName) {
 	ViewContainer.call(this, render);
-	this.realImage = imageName;
-	this.image = "img/" + imageName;
+	this.originImagePath = imageName;
+	this.imagePath = "img/" + imageName;
+	this.image = new Image();
+	this.image.src = this.imagePath;
 
 	this.setImage = function(imageName) {
-		this.realImage = imageName;
-		this.image = "img/" + imageName;
+		this.originImagePath = imageName;
+		this.imagePath = "img/" + imageName;
+		this.image.src = this.imagePath;
 	}
 
 	this.getImage = function() {
-		return this.realImage;
+		return this.originImagePath;
 	}
 
 	this.doDraw = function() {
-		var img = new Image();
-		img.src = this.image;
+		var img = this.image;
 
 		var x = this.getPositionX();
 		var y = this.getPositionY();
@@ -329,18 +331,26 @@ function TextView(render, txt) {
 
 function ButtonView(render, normalImage, selectImage, disableImage) {
 	ViewContainer.call(this, render);
-	this.normalImage = "img/" + normalImage;
+	this.normalImagePath = "img/" + normalImage;
+	this.normalImage = new Image();
+	this.normalImage.src = this.normalImagePath;
+
+	this.selectImage = new Image();
+	this.disableImage = new Image();
 	if (selectImage != null) {
-		this.selectImage = "img/" + selectImage;
+		this.selectImagePath = "img/" + selectImage;
 		if (disableImage != null) {
-			this.disableImage = "img/" + disableImage;
+			this.disableImagePath = "img/" + disableImage;
 		} else {
-			this.disableImage = this.normalImage;
+			this.disableImagePath = this.normalImagePath;
 		}
 	} else {
-		this.selectImage = this.normalImage;
-		this.disableImage = this.normalImage;
+		this.selectImagePath = this.normalImagePath;
+		this.disableImagePath = this.normalImagePath;
 	}
+	this.selectImage.src = this.selectImagePath;
+	this.disableImage.src = this.disableImagePath;
+
 	this.currentImage = this.normalImage;
 	this.touchBeganHandler = null;
 	this.touchEndedHandler = null;
@@ -360,8 +370,7 @@ function ButtonView(render, normalImage, selectImage, disableImage) {
 		this.touchEndedHandler = handler;
 	}
 	this.doDraw = function() {
-		var img = new Image();
-		img.src = this.currentImage;
+		var img = this.currentImage;
 
 		var x = this.getPositionX();
 		var y = this.getPositionY();
