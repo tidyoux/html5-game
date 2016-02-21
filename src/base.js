@@ -394,7 +394,7 @@ function Stage(render) {
 }
 
 function World(width, height, interval) {
-	interval = interval || 0.1;
+	interval = interval || 0.05;
 	var mlInterval = interval * 1000;
 	this.size = new Size(width, height);
 	this.render = document.getElementById('myCanvas').getContext('2d'); 
