@@ -130,11 +130,11 @@ function GameWorld(width, height) {
 	}
 
 	this.showResult = function() {
+		var name0 = self.icon0._userData.getIconName();
 		var name1 = self.icon1._userData.getIconName();
-		var name2 = self.icon2._userData.getIconName();
-		if (name2 == name1) {
-			var name3 = self.icon3._userData.getIconName();
-			if (name3 == name1) {
+		if (name1 == name0) {
+			var name2 = self.icon2._userData.getIconName();
+			if (name2 == name0) {
 				self.playBtn.setTouchEnabled(true);
 				return;
 			}
