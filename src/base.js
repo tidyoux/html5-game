@@ -394,8 +394,8 @@ function Stage(render) {
 }
 
 function World(width, height, interval) {
-	interval = interval || 0.05;
-	this.timer = null;
+	interval = interval || 0.1;
+	var mlInterval = interval * 1000;
 	this.size = new Size(width, height);
 	this.render = document.getElementById('myCanvas').getContext('2d'); 
 	this.stage = new Stage(this.render);
@@ -418,10 +418,11 @@ function World(width, height, interval) {
 		this.stage.draw();
 	}
 	this.run = function() {
-		this.timer = setInterval(
-				function() {
-					self.update(interval);
-				}, 1000 * interval);
+		var onTick = function() {
+			self.update(interval);
+			window.setTimeout(onTick, mlInterval);
+		}
+		window.setTimeout(onTick, mlInterval);
 	}
 	this.run();
 }
