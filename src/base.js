@@ -1,4 +1,10 @@
 ﻿
+
+function log(s) {
+	console.log(s);
+}
+
+//////////////////////////////
 function Point(x, y) {
 	this.x = x;
 	this.y = y;
